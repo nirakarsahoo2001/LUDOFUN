@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/splash_bg"
+    android:padding="20dp">
+
+
+
+    <TextView
+        android:id="@+id/tvSelectPlayers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Players"
+        android:textSize="36sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_marginBottom="50dp"
+        android:shadowColor="#000000"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="4"/>
+
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn2Player"
+            android:layout_width="280dp"
+            android:layout_height="70dp"
+            android:text="2 PLAYER"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:backgroundTint="#FF5722"
+            android:elevation="8dp"
+            android:layout_margin="10dp"/>
+
+        <Button
+            android:id="@+id/btn3Player"
+            android:layout_width="280dp"
+            android:layout_height="70dp"
+            android:text="3 PLAYER"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:backgroundTint="#4CAF50"
+            android:elevation="8dp"
+            android:layout_margin="10dp"/>
+
+        <Button
+            android:id="@+id/btn4Player"
+            android:layout_width="280dp"
+            android:layout_height="70dp"
+            android:text="4 PLAYER"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:backgroundTint="#2196F3"
+            android:elevation="8dp"
+            android:layout_margin="10dp"/>
+    </LinearLayout>
+
+</LinearLayout>
