@@ -147,25 +147,18 @@ public class BoardView extends View {
     
     private void drawGameOverMessage(Canvas canvas) {
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.parseColor("#80FF4081")); // transparent game over message with pink color
-        paint.setAlpha(130);// background color change with transparency
+        paint.setColor(Color.parseColor("#80000000")); // semi-transparent black background
         canvas.drawRect(0, 0, 15 * cell, 15 * cell, paint);
 
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(cell * 2.0f);
+        paint.setColor(Color.RED); // Bold red letters
+        paint.setTextSize(cell * 2.5f);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         paint.setTextAlign(Paint.Align.CENTER);
 
         float centerX = (15 * cell) / 2f;
         float centerY = (15 * cell) / 2f;
 
-        canvas.drawText("GAME OVER", centerX, centerY - cell, paint);
-
-        paint.setTextSize(cell * 1.2f);
-        for (int i = 0; i < winners.size(); i++) {
-            String colorName = getPlayerColorName(winners.get(i));
-            canvas.drawText((i + 1) + ". " + colorName, centerX, centerY + (i + 1) * cell, paint);
-        }
+        canvas.drawText("GAME OVER", centerX, centerY, paint);
     }
 
     private String getPlayerColorName(int player) {
@@ -181,6 +174,11 @@ public class BoardView extends View {
     public void setGameOver() {
         this.isGameOver = true;
         invalidate();
+        // Play game over sound
+        int resId = getResources().getIdentifier("win_sound_end", "raw", getContext().getPackageName());
+        if (resId != 0) {
+            MusicManager.playSound(getContext(), resId);
+        }
     }
 
     private void addTokensToMap(Map<String, List<TokenInfo>> map, int[] tokens, int color, int player) {
@@ -519,9 +517,14 @@ public class BoardView extends View {
         if (targetTokens.isEmpty()) return false;
 
         // Logic: Kill the LAST token that reached this position.
-        // We'll kill the last one found in the list.
         OpponentToken target = targetTokens.get(targetTokens.size() - 1);
         getTokens(target.player)[target.index] = -1;
+        
+        // Play kill sound (using dice roll as placeholder since specialized kill sound is missing)
+        int killResId = getResources().getIdentifier("kill_sound", "raw", getContext().getPackageName());
+        if (killResId != 0) {
+            MusicManager.playSound(getContext(), killResId);
+        }
         
         invalidate();
         return true;
@@ -555,9 +558,6 @@ public class BoardView extends View {
 
         // Special Rule: If last token is "inside" home path (distance < 6), rolling a 6 will not work.
         if (unfinishedCount == 1 && dice == 6) {
-            // tokens[lastTokenIndex] is current steps moved.
-            // distance to goal = 56 - tokens[lastTokenIndex].
-            // "Inside" home path means distance < 6, which is steps > 50 (51-55).
             if (tokens[lastTokenIndex] > 50) return false;
         }
 
@@ -672,7 +672,6 @@ public class BoardView extends View {
         if (isPlayerActive(3)) activeCount++;
         if (isPlayerActive(4)) activeCount++;
 
-        // Modified: Game ends if only ONE player is NOT finished
         if (winners.size() >= activeCount - 1) {
             return winners.isEmpty() ? 0 : winners.get(0);
         }
@@ -681,6 +680,10 @@ public class BoardView extends View {
 
     public boolean isPlayerFinished(int player) {
         return winners.contains(player);
+    }
+
+    public List<Integer> getWinnersList() {
+        return winners;
     }
 
     private boolean isAllFinished(int[] tokens) {

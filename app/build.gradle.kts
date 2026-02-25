@@ -32,11 +32,15 @@ android {
 }
 
 dependencies {
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    
+
+    // ✅ Use ONLY Sceneform (REMOVE SceneView completely)
+    implementation("com.gorisse.thomas.sceneform:sceneform:1.21.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
