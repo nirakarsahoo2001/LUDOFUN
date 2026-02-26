@@ -12,18 +12,34 @@
         android:layout_height="match_parent"
         android:background="#40000000" />
 
+    <!-- Stylish Sound Toggle Button -->
+    <ImageButton
+        android:id="@+id/btnSoundToggle"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/dice_circle_bg"
+        android:padding="12dp"
+        android:scaleType="centerInside"
+        android:src="@android:drawable/ic_lock_silent_mode_off"
+        app:tint="#FFFFFF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="10dp"
+        android:stateListAnimator="@null" />
+
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="LUDO FUN"
-        android:textSize="50sp"
+        android:textSize="54sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:shadowColor="#000000"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="10"
+        android:shadowColor="#80000000"
+        android:shadowDx="6"
+        android:shadowDy="6"
+        android:shadowRadius="12"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,61 +47,84 @@
 
     <LinearLayout
         android:id="@+id/buttonContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="20dp">
 
         <Button
             android:id="@+id/btnOffline"
-            android:layout_width="280dp"
-            android:layout_height="70dp"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
             android:textStyle="bold"
             android:text="PLAY OFFLINE"
-            android:textSize="20sp"
-            android:backgroundTint="#FF5722"
+            android:textSize="22sp"
+            android:background="@drawable/stylish_button_bg"
+            app:backgroundTint="@null"
             android:textColor="#FFFFFF"
-            android:elevation="8dp"
-            android:layout_marginBottom="20dp"/>
+            android:elevation="12dp"
+            android:layout_marginBottom="20dp"
+            android:stateListAnimator="@null"/>
+
+        <Button
+            android:id="@+id/btnVsComputer"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
+            android:textStyle="bold"
+            android:text="WITH COMPUTER"
+            android:textSize="22sp"
+            android:background="@drawable/stylish_button_gold"
+            app:backgroundTint="@null"
+            android:textColor="#000000"
+            android:elevation="12dp"
+            android:layout_marginBottom="20dp"
+            android:stateListAnimator="@null"/>
 
         <Button
             android:id="@+id/btnOnline"
-            android:layout_width="280dp"
-            android:layout_height="70dp"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
             android:textStyle="bold"
             android:text="PLAY ONLINE"
-            android:textSize="20sp"
-            android:backgroundTint="#4CAF50"
+            android:textSize="22sp"
+            android:background="@drawable/stylish_button_green"
+            app:backgroundTint="@null"
             android:textColor="#FFFFFF"
-            android:elevation="8dp"
-            android:layout_marginBottom="20dp"/>
+            android:elevation="12dp"
+            android:layout_marginBottom="20dp"
+            android:stateListAnimator="@null"/>
 
         <Button
             android:id="@+id/btnJoinRoom"
-            android:layout_width="280dp"
-            android:layout_height="70dp"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
             android:textStyle="bold"
             android:text="JOIN ROOM"
-            android:textSize="20sp"
-            android:backgroundTint="#2196F3"
+            android:textSize="22sp"
+            android:background="@drawable/stylish_button_blue"
+            app:backgroundTint="@null"
             android:textColor="#FFFFFF"
-            android:elevation="8dp"
-            android:layout_marginBottom="20dp"/>
+            android:elevation="12dp"
+            android:layout_marginBottom="20dp"
+            android:stateListAnimator="@null"/>
 
         <Button
             android:id="@+id/btnCreateRoom"
-            android:layout_width="280dp"
-            android:layout_height="70dp"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
             android:textStyle="bold"
             android:text="CREATE ROOM"
-            android:textSize="20sp"
-            android:backgroundTint="#9C27B0"
+            android:textSize="22sp"
+            android:background="@drawable/stylish_button_purple"
+            app:backgroundTint="@null"
             android:textColor="#FFFFFF"
-            android:elevation="8dp"/>
+            android:elevation="12dp"
+            android:stateListAnimator="@null"/>
 
     </LinearLayout>
 

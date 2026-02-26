@@ -58,14 +58,39 @@ public class BoardView extends View {
     }
     private OnMoveFinishedListener moveFinishedListener;
 
+    public interface OnWaitingForMoveListener {
+        void onWaitingForMove();
+    }
+    private OnWaitingForMoveListener waitingForMoveListener;
+
     public void setOnMoveFinishedListener(OnMoveFinishedListener listener) {
         this.moveFinishedListener = listener;
+    }
+
+    public void setOnWaitingForMoveListener(OnWaitingForMoveListener listener) {
+        this.waitingForMoveListener = listener;
     }
 
     public void setTotalPlayers(int totalPlayers) {
         this.totalPlayers = totalPlayers;
         invalidate();
     }
+
+    // Persist State logic
+    public int[] getRedTokens() { return redTokens; }
+    public void setRedTokens(int[] tokens) { this.redTokens = tokens; invalidate(); }
+
+    public int[] getGreenTokens() { return greenTokens; }
+    public void setGreenTokens(int[] tokens) { this.greenTokens = tokens; invalidate(); }
+
+    public int[] getYellowTokens() { return yellowTokens; }
+    public void setYellowTokens(int[] tokens) { this.yellowTokens = tokens; invalidate(); }
+
+    public int[] getBlueTokens() { return blueTokens; }
+    public void setBlueTokens(int[] tokens) { this.blueTokens = tokens; invalidate(); }
+
+    public int getCurrentPlayer() { return currentPlayer; }
+    public void setCurrentPlayer(int player) { this.currentPlayer = player; invalidate(); }
 
     public BoardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -128,10 +153,6 @@ public class BoardView extends View {
         
         drawStackedTokens(canvas, positionMap);
         
-        if (isGameOver) {
-            drawGameOverMessage(canvas);
-        }
-        
         canvas.restore();
     }
 
@@ -143,22 +164,6 @@ public class BoardView extends View {
             return ludoPlayer == 1 || ludoPlayer == 2 || ludoPlayer == 3;
         }
         return true; // 4 players or default
-    }
-    
-    private void drawGameOverMessage(Canvas canvas) {
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.parseColor("#80000000")); // semi-transparent black background
-        canvas.drawRect(0, 0, 15 * cell, 15 * cell, paint);
-
-        paint.setColor(Color.RED); // Bold red letters
-        paint.setTextSize(cell * 2.5f);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setTextAlign(Paint.Align.CENTER);
-
-        float centerX = (15 * cell) / 2f;
-        float centerY = (15 * cell) / 2f;
-
-        canvas.drawText("GAME OVER", centerX, centerY, paint);
     }
 
     private String getPlayerColorName(int player) {
@@ -587,6 +592,10 @@ public class BoardView extends View {
             invalidate();
         });
         hintAnimator.start();
+
+        if (waitingForMoveListener != null) {
+            waitingForMoveListener.onWaitingForMove();
+        }
     }
 
     private void stopHintAnimation() {
@@ -662,6 +671,91 @@ public class BoardView extends View {
                 }
                 startHintAnimation();
             }
+        }
+    }
+
+    public void performAiMove() {
+        if (movableTokenIndices.isEmpty() || isAnimating) return;
+
+        int[] tokens = getTokens(currentPlayer);
+        int bestIndex = -1;
+        int maxPriority = -1;
+
+        for (int idx : movableTokenIndices) {
+            int priority = 1; // Default priority
+            int currentSteps = tokens[idx];
+            int targetSteps = (currentSteps == -1) ? 0 : currentSteps + diceValue;
+
+            // 1. Check if it can KILL an opponent (Highest priority)
+            if (targetSteps <= 50) {
+                int targetPathIdx = (startIndex[currentPlayer - 1] + targetSteps) % 52;
+                if (!isSafe(targetPathIdx)) {
+                    for (int p = 1; p <= 4; p++) {
+                        if (p == currentPlayer) continue;
+                        int[] oppTokens = getTokens(p);
+                        for (int ot : oppTokens) {
+                            if (ot != -1 && ot <= 50) {
+                                int oppPathIdx = (startIndex[p - 1] + ot) % 52;
+                                if (oppPathIdx == targetPathIdx) {
+                                    priority = 100; // Found a kill!
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Check if it can reach the GOAL (Second highest)
+            if (targetSteps == 56) {
+                priority = Math.max(priority, 90);
+            }
+
+            // 3. Move token OUT of home base (Third highest)
+            if (currentSteps == -1 && diceValue == 6) {
+                priority = Math.max(priority, 80);
+            }
+
+            // 4. Move token into HOME PATH (Fourth highest)
+            if (currentSteps <= 50 && targetSteps > 50) {
+                priority = Math.max(priority, 70);
+            }
+
+            // 5. Move a token that is IN DANGER (if an opponent is behind it)
+            if (currentSteps != -1 && currentSteps <= 50) {
+                int currentPathIdx = (startIndex[currentPlayer - 1] + currentSteps) % 52;
+                if (!isSafe(currentPathIdx)) {
+                    for (int p = 1; p <= 4; p++) {
+                        if (p == currentPlayer) continue;
+                        int[] oppTokens = getTokens(p);
+                        for (int ot : oppTokens) {
+                            if (ot != -1 && ot <= 50) {
+                                int oppPathIdx = (startIndex[p - 1] + ot) % 52;
+                                // If opponent is between 1 and 6 steps behind
+                                int dist = (currentPathIdx - oppPathIdx + 52) % 52;
+                                if (dist > 0 && dist <= 6) {
+                                    priority = Math.max(priority, 60);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 6. Prefer tokens that are further ahead
+            priority = Math.max(priority, currentSteps + 10);
+
+            if (priority > maxPriority) {
+                priority = maxPriority;
+                bestIndex = idx;
+            }
+        }
+
+        if (bestIndex != -1) {
+            final int finalBestIndex = bestIndex;
+            handler.postDelayed(() -> {
+                stopHintAnimation();
+                moveToken(tokens, finalBestIndex);
+            }, 800);
         }
     }
 

@@ -13,13 +13,15 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnOffline, btnOnline, btnJoinRoom, btnCreateRoom;
+    private Button btnVsComputer, btnOffline, btnOnline, btnJoinRoom, btnCreateRoom;
+    private ImageButton btnSoundToggle;
     private TextView tvTitle;
     private LinearLayout buttonContainer;
 
@@ -30,10 +32,15 @@ public class MainActivity extends AppCompatActivity {
 
         tvTitle = findViewById(R.id.tvTitle);
         buttonContainer = findViewById(R.id.buttonContainer);
+        btnVsComputer = findViewById(R.id.btnVsComputer);
         btnOffline = findViewById(R.id.btnOffline);
         btnOnline = findViewById(R.id.btnOnline);
         btnJoinRoom = findViewById(R.id.btnJoinRoom);
         btnCreateRoom = findViewById(R.id.btnCreateRoom);
+        btnSoundToggle = findViewById(R.id.btnSoundToggle);
+
+        // Start background music automatically if enabled
+        MusicManager.playMusic(this, R.raw.splash_sound);
 
         // Apply Stylish Gradient to the Title
         applyTitleGradient();
@@ -42,10 +49,30 @@ public class MainActivity extends AppCompatActivity {
         animateUI();
 
         // Setup Stylish Click Animations
+        setupButtonClick(btnVsComputer, () -> {
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra("players", 2);
+            intent.putExtra("vsComputer", true);
+            startActivity(intent);
+        });
         setupButtonClick(btnOffline, () -> startActivity(new Intent(this, OfflineActivity.class)));
         setupButtonClick(btnOnline, () -> startActivity(new Intent(this, OnlineActivity.class)));
         setupButtonClick(btnJoinRoom, () -> {});
         setupButtonClick(btnCreateRoom, () -> {});
+
+        btnSoundToggle.setOnClickListener(v -> {
+            MusicManager.toggleSound(this, R.raw.splash_sound);
+            updateSoundIcon();
+        });
+        updateSoundIcon();
+    }
+
+    private void updateSoundIcon() {
+        if (MusicManager.isSoundEnabled(this)) {
+            btnSoundToggle.setImageResource(android.R.drawable.ic_lock_silent_mode_off);
+        } else {
+            btnSoundToggle.setImageResource(android.R.drawable.ic_lock_silent_mode);
+        }
     }
 
     private void applyTitleGradient() {
@@ -130,7 +157,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MusicManager.resumeMusic();
+        MusicManager.resumeMusic(this);
+        updateSoundIcon();
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
@@ -17,9 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class OfflineActivity extends AppCompatActivity {
+public class PlayerSelectionActivity extends AppCompatActivity {
 
-    private Button btnNewGame, btnResume, btnSnakeGame;
+    private Button btn2, btn3, btn4;
     private TextView tvTitle;
     private LinearLayout buttonContainer;
 
@@ -29,50 +28,45 @@ public class OfflineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_offline);
 
         tvTitle = findViewById(R.id.tvOfflineTitle);
+        tvTitle.setText("Select Players");
         buttonContainer = findViewById(R.id.buttonContainer);
-        btnNewGame = findViewById(R.id.btnNewGame);
-        btnResume = findViewById(R.id.btnResume);
-        btnSnakeGame = findViewById(R.id.btnSnakeGame);
+        
+        btn2 = findViewById(R.id.btnNewGame);
+        btn2.setText("2 PLAYER");
+        btn2.setBackgroundResource(R.drawable.stylish_button_bg);
+        
+        btn3 = findViewById(R.id.btnResume);
+        btn3.setText("3 PLAYER");
+        btn3.setVisibility(View.VISIBLE);
+        btn3.setBackgroundResource(R.drawable.stylish_button_green);
+        
+        btn4 = findViewById(R.id.btnSnakeGame);
+        btn4.setText("4 PLAYER");
+        btn4.setBackgroundResource(R.drawable.stylish_button_blue);
 
-        // Set stylish backgrounds
-        btnNewGame.setBackgroundResource(R.drawable.stylish_button_bg);
-        btnResume.setBackgroundResource(R.drawable.stylish_button_green);
-        btnSnakeGame.setBackgroundResource(R.drawable.stylish_button_blue);
+        // Hide sound toggle on this page if it's there
+        View soundToggle = findViewById(R.id.btnSoundToggle);
+        if (soundToggle != null) soundToggle.setVisibility(View.GONE);
 
         applyTitleGradient();
         animateUI();
 
-        setupButtonClick(btnNewGame, () -> {
-            // Reset saved game and start new selection
-            getSharedPreferences("LudoPrefs", MODE_PRIVATE).edit().putBoolean("hasSavedGame", false).apply();
-            startActivity(new Intent(this, PlayerSelectionActivity.class));
-        });
+        setupButtonClick(btn2, () -> startGame(2));
+        setupButtonClick(btn3, () -> startGame(3));
+        setupButtonClick(btn4, () -> startGame(4));
+    }
 
-        setupButtonClick(btnResume, () -> {
-            Intent intent = new Intent(this, GameActivity.class);
-            intent.putExtra("resume", true);
-            startActivity(intent);
-        });
-
-        setupButtonClick(btnSnakeGame, () -> {
-            // Start Snake Game placeholder
-        });
+    private void startGame(int players) {
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra("players", players);
+        startActivity(intent);
+        finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Ensure music continues if enabled
-        MusicManager.resumeMusic();
-        
-        // Check if there's a game to resume whenever we come back to this screen
-        SharedPreferences prefs = getSharedPreferences("LudoPrefs", MODE_PRIVATE);
-        boolean hasSavedGame = prefs.getBoolean("hasSavedGame", false);
-        if (hasSavedGame) {
-            btnResume.setVisibility(View.VISIBLE);
-        } else {
-            btnResume.setVisibility(View.GONE);
-        }
+        MusicManager.resumeMusic(this);
     }
 
     @Override
